@@ -1,0 +1,20 @@
+{
+    "name": "Grinder",
+    "description": "Grinds materials back into scrap.",
+    "hasLiquids": false,
+	"hasItems": true,
+	"update": true,
+    "consumes": {
+      "power": 3.0
+    },
+    "hasPower": true,
+    "size": 3,
+    "requirements": [
+        { "item": "copper", "amount": 100 },
+        { "item": "graphite", "amount": 25 },
+		{ "item": "lead", "amount": 150 },
+    ],
+    "category": "crafting",
+	"group": "none"
+
+}

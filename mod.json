@@ -1,0 +1,8 @@
+name: equinox-tech
+displayName:  Equinox Tech mod
+author: Xelo
+description: Adds things, but mostly used used as a test
+version: "0.1.3"
+hidden: false
+minGameVersion: "104.0"
+dependencies: [ ]

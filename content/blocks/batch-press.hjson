@@ -1,0 +1,22 @@
+{
+    "name": "Batch press",
+    "description": "Higher output ratio then the multipress, but processes in batches",
+    "hasLiquids": false,
+	"hasItems": true,
+	"update": true,
+    "consumes": {
+      "power": 3.0
+    },
+    "hasPower": true,
+    "size": 4,
+    "requirements": [
+        { "item": "silicon", "amount": 80 },
+        { "item": "thorium", "amount": 25 },
+		{ "item": "lead", "amount": 200 },
+		{ "item": "titanium", "amount": 200 },
+		{ "item": "graphite", "amount": 100 },
+    ],
+    "category": "crafting",
+	"group": "none"
+
+}
