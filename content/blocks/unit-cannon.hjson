@@ -1,0 +1,30 @@
+{
+    "name": "Unit Cannon",
+    "description": "Yeets friendly units behind enemy walls",
+    "hasLiquids": true,
+	"hasItems": false,
+	"health": 2000,
+	"update": true,
+	"configurable": true,
+	"posConfig": true,
+	"solid":false,
+    "consumes": {
+      "power": 3.0,
+	  "liquid": {
+        "liquid": "water",
+        "amount": 0.2
+		},
+    },
+	"outlineIcon" : true,
+    "hasPower": true,
+    "size": 4,
+    "requirements": [
+        { "item": "titanium", "amount": 100 },
+        { "item": "graphite", "amount": 125 },
+		{ "item": "silicon", "amount": 250 },
+		{ "item": "surge-alloy", "amount": 150 },
+    ],
+    "category": "units",
+	"group": "none"
+
+}
