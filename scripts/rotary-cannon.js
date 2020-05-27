@@ -62,16 +62,16 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 	},
 	peekAmmo(tile){
 		var ent = tile.entity;
-		if(ent.getAmmoType==Items.thorium){
+		if(ent.getAmmoType()==Items.thorium){
 			return Bullets.standardThorium;
 		}
-		if(ent.getAmmoType==Items.lead){
+		if(ent.getAmmoType()==Items.lead){
 			return Bullets.standardDense;
 		}
-		if(ent.getAmmoType==Items.copper){
+		if(ent.getAmmoType()==Items.copper){
 			return Bullets.standardCopper;
 		}
-		if(ent.getAmmoType==Items.pyratite){
+		if(ent.getAmmoType()==Items.pyratite){
 			return Bullets.standardIncendiary;
 		}
 		return Bullets.standardCopper;
