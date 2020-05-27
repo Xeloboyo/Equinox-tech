@@ -16,7 +16,6 @@ const batchpress = extendContent(Block, "batch-press", {
 		}else{
 			ent.setSpeed(Mathf.lerpDelta(ent.getSpeed(), 0, 0.05));
 		}	
-		
 		if(ent.getUnloading()){
 			while(this.tryDump(tile,Items.graphite)){}
 			
@@ -31,17 +30,12 @@ const batchpress = extendContent(Block, "batch-press", {
 					ent.items.clear();
 					ent.items.add(Items.graphite,9);
 					ent.setUnloading(true);
-					
 					for(var i =0;i<10;i++){
 						Effects.effect(Fx.fuelburn,(tile.x-1.4)* Vars.tilesize, Vars.tilesize*(tile.y + Mathf.random(-1.4,1.4)));
-						
 					}
-					
 				}
 			}
-			
 		}
-		
 		///this.offloadNear(tile,Items.scrap);
 		
 	},

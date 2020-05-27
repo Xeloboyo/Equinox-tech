@@ -95,8 +95,6 @@ const unitcannon = extendContent(Block, "unit-cannon", {
 	update(tile){
 		
 		var ent = tile.entity;
-		
-		
 		var satisfaction = ent.power.graph.getSatisfaction() ;
 		ent.setReload(Math.max(0,ent.getReload()-basereloadspeed*satisfaction));
 		
