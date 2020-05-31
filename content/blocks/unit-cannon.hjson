@@ -10,10 +10,6 @@
 	"solid":false,
     "consumes": {
       "power": 3.0,
-	  "liquid": {
-        "liquid": "water",
-        "amount": 0.2
-		},
     },
 	"outlineIcon" : true,
     "hasPower": true,

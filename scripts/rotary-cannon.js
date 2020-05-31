@@ -1,7 +1,7 @@
 
-const speeddecay= 0.001;
+const speeddecay= 0.002;
 
-const range = 200;
+
 const maxAmmo = 200;
 const liquidCapacity = 30;
 const ammoMultiplier = 2;
@@ -17,16 +17,18 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 	reloadAm: 10,
 	recoilAm: 1,
 	xRand:0,
+	maxAmmo:200,
+	range:200,
 	
 	update(tile){
 		
 		var ent = tile.entity;
-		ent.setSpeed(ent.getSpeed()*(1.0-speeddecay * (ent.getTarget()==undefined?5:1)));
-		ent.setLastammoinput(ent.getLastammoinput()+1);
+		ent.setSpeed(ent.getSpeed()*(1.0-speeddecay * ((ent.getTarget()==undefined || !this.hasAmmo(tile))?15:1)));
+		ent.setLastammoinput(ent.getLastammoinput()+ent.delta());
 		
 		if(!this.validateTarget(tile)) ent.clearTarget();
-		ent.setRecoil( Mathf.lerpDelta(ent.getRecoil(),0,0.1));
-		ent.setHeat( Mathf.lerpDelta(ent.getHeat(),0,0.05));
+		ent.setRecoil( Mathf.lerpDelta(ent.getRecoil(),0,0.1*ent.delta()));
+		ent.setHeat( Mathf.lerpDelta(ent.getHeat(),0,0.05*ent.delta()));
 		
 		if(this.hasAmmo(tile)){
 			
@@ -89,12 +91,12 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 		}else{
             ent.setReload( ent.getReload()+ent.delta() * this.peekAmmo(tile).reloadMultiplier * this.baseReloadSpeed(tile) * (ent.getSpeed()));
         }
-		ent.setSpeed(ent.getSpeed()+0.03);
+		ent.setSpeed(Math.min(ent.delta()*this.reloadAm*5,ent.getSpeed()+0.03));
     },
 	
 	baseReloadSpeed(tile){
 		var liquid = tile.entity.liquids.current();
-		return 1.0+ liquid.heatCapacity*0.3 * Math.min(1.0,tile.entity.liquids.get(liquid)*0.3);
+		return 0.5+ liquid.heatCapacity*0.3 * Math.min(1.0,tile.entity.liquids.get(liquid)/this.liquidCapacity);
     },
 	
 	shoot( tile,  type){
@@ -108,9 +110,9 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 		tr2.trns(entity.getRotation()+90, rot* Vars.tilesize / 3.0 , 0.0);
 		tr = tr.add(tr2);
 		
-		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, entity.getRotation() + Mathf.range(this.inaccuracy + type.inaccuracy));
+		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, entity.getRotation() + Mathf.range(this.inaccuracy + type.inaccuracy),2.0,0.5);
 		
-        this.effects(tile);
+        this.effects(tile,tr);
         this.useAmmo(tile);
     },
 	draw(tile){
@@ -120,17 +122,17 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 	},
 	drawLayer(tile){
         var ent = tile.entity;
-		ent.setFrame((Time.time()-ent.getPrevtime())*ent.getSpeed()*0.4 + ent.getFrame());
-		var cframe  = this.animationframes[Math.floor(ent.getFrame())%this.animationframes.length];
-		this.drawTurretRect(cframe,tile);
-		/*
+		ent.setFrame((Time.time()-ent.getPrevtime())*Math.min(5,ent.getSpeed()*0.4) + ent.getFrame());
+		var cframe  = Math.floor(ent.getFrame())%this.animationframes.length;
+		this.drawTurretRect(this.animationframes[cframe],tile);
+		
 		if(ent.heat <= 0.001) return;
 		
-			Draw.color(Pal.turretHeat, Mathf.min(1.0,ent.heat));
+			Draw.color(Pal.turretHeat, Math.min(2.0,ent.heat));
 			Draw.blend(Blending.additive);
-			this.drawTurretRect(this.heatRegion,tile);
+			this.drawTurretRect(this.heatanimationframes[cframe],tile);
 			Draw.blend();
-			Draw.color();	*/
+			Draw.color();	
 		ent.setPrevtime (Time.time());	
     },
 
@@ -144,18 +146,20 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 			);
 	},
 	drawSelect( tile){
-        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, tile.getTeam().color);
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), this.range, tile.getTeam().color);
     },
 
     drawPlace( x,  y,  rotation,  valid){
-        Drawf.dashCircle(x * Vars.tilesize + this.offset(), y * Vars.tilesize + this.offset(), range, Pal.placing);
+        Drawf.dashCircle(x * Vars.tilesize + this.offset(), y * Vars.tilesize + this.offset(), this.range, Pal.placing);
     },
 	load(){
 		this.super$load();
 		this.baseRegion = Core.atlas.find("block-" + 3);
 		this.animationframes = [];
+		this.heatanimationframes = [];
 		for(var i=1;i<=9;i++){
 			this.animationframes.push(Core.atlas.find(this.name+"-"+i));
+			this.heatanimationframes.push(Core.atlas.find(this.name+"-heat-"+i));
 		}
 		Log.debug(""+this.animationframes[0]);
 		this.layer = Layer.turret;
@@ -165,16 +169,14 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 	generateIcons(){
 		var processed = [];
 		processed.push (Core.atlas.find("block-" + 3));
-		for(var i=1;i<=9;i++){
-			processed.push(Core.atlas.find(this.name+"-"+i));
-		}
+		processed.push(Core.atlas.find(this.name));
         return processed;
     },
 	
 	acceptItem(item,tile,source){
 		var ent = tile.entity;
 		
-		return ent.getLastammoinput()>20 && (ent.getAmmoType() === item || ent.getAmmo()==0) && ent.getAmmo()<maxAmmo;
+		return ent.getLastammoinput()>20 && (ent.getAmmoType() === item || ent.getAmmo()==0) && ent.getAmmo()<this.maxAmmo;
 		
 	},
 	handleItem(item,tile,source){
@@ -194,7 +196,7 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 	findTarget(tile){
         entity = tile.entity;
 
-        entity.setTarget(Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, boolf(e => !e.isDead() ) ));
+        entity.setTarget(Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), this.range, boolf(e => !e.isDead() ) ));
     },
 	turnToTarget( tile,  targetRot){
         entity = tile.entity;
@@ -208,18 +210,49 @@ const rotcannon = extendContent(Block , "rotary-cannon", {
 		return tile.entity.setAmmo(tile.entity.getAmmo()-1);
 	},
 	
-	effects( tile){
-        
+	effects( tile,tr){
+        var entity = tile.entity;
 
-        tile.entity.setRecoil( this.recoilAm);
+        entity.setRecoil( this.recoilAm);
+		var ddd = this.peekAmmo(tile);
+		 var shootEffect = ddd.shootEffect ;
+        var smokeEffect =  ddd.smokeEffect;
+
+    
+
+        Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.getRotation());
+		Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.getRotation());
+		Sounds.shoot.at(tile, Mathf.random(0.9, 1.1));
+    },
+	
+	setStats(){
+		this.super$setStats();
+		this.stats.add(BlockStat.range, this.range,StatUnit.blocks);
+		this.stats.add(BlockStat.booster, new BoosterListValue(this.reloadAm, this.consumes.get(ConsumeType.liquid).amount, 1.0, true, boolf(liquid=>liquid.temperature<=0.5&&liquid.flammability<0.1))); //needs a boolf(liquid)
+	},
+
+	setBars(){
+        this.super$setBars();
+
+		var func = new Func(){
+			get(entity){ 
+				return new Bar("blocks.ammo", Pal.ammo, floatp(() => entity.getAmmo() / maxAmmo)); 
+			}
+		};
+        this.bars.add("Ammo",func);
+        
     }
 	
 	
+	
 });
-rotcannon.consumes.add(new ConsumeLiquidFilter(boolf(liquid=>liquid.temperature<=0.5&&liquid.flammability<0.1), 0.5 * 1.0)).update(false);
+
+const coolantfilter = new ConsumeLiquidFilter(boolf(liquid=>liquid.temperature<=0.5&&liquid.flammability<0.1), 0.5 * 1.0);
+
+rotcannon.consumes.add(coolantfilter).update(false);
 rotcannon.priority = TargetPriority.turret;
 
-
+rotcannon.liquidCapacity = 20.0;
 
 rotcannon.entityType=prov(()=>extend(TileEntity,{
 	_timer: 0,

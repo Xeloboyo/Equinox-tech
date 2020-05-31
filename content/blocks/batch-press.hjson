@@ -17,6 +17,7 @@
 		{ "item": "graphite", "amount": 100 },
     ],
     "category": "crafting",
-	"group": "none"
+	"group": "none",
+	"research": "multi-press",
 
 }

@@ -12,7 +12,7 @@ const grinder = extendContent(Block, "grinder", {
 			ent.setSpeed(0);
 		}
 		if(ent.power.graph.getSatisfaction() > 0.2){
-			ent.setSpeed(Mathf.lerpDelta(ent.getSpeed(), 1, 0.003));
+			ent.setSpeed(Mathf.lerpDelta(ent.getSpeed(), 1*ent.delta(), 0.003));
 		}else{
 			ent.setSpeed(Mathf.lerpDelta(ent.getSpeed(), 0, 0.01));
 		}	
@@ -55,7 +55,6 @@ const grinder = extendContent(Block, "grinder", {
 		for(var i=1;i<9;i++){
 			this.animationframes.push(Core.atlas.find(this.name+"-"+i));
 		}
-		Log.debug(""+this.animationframes[0]);
 		this.region = this.animationframes[0];
 		
 	},
@@ -66,6 +65,12 @@ const grinder = extendContent(Block, "grinder", {
 	handleItem(item,tile,source){
 		tile.entity.items.add(item, 1);
 	},
+	setStats(){
+		this.super$setStats();
+		this.stats.add(BlockStat.productionTime, (5.0) / 60.0, StatUnit.seconds);
+        this.stats.add(BlockStat.output, new ItemListValue(new ItemStack(Items.scrap, 1)));
+		this.stats.add(BlockStat.output, new StringValue("30% chance"));
+	}
 	
 });
 

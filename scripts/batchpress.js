@@ -42,7 +42,7 @@ const batchpress = extendContent(Block, "batch-press", {
 	draw(tile){
 		var ent = tile.entity;
 
-		ent.setFrame((Time.time()-ent.getPrevtime())*ent.getSpeed()*((!ent.getUnloading() && ent.items.get(Items.coal)===9)?-1:1) + ent.getFrame());
+		ent.setFrame((Time.time()-ent.getPrevtime())*ent.getSpeed()*((!ent.getUnloading() && ent.items.get(Items.coal)===9)?-1:1)*ent.delta() + ent.getFrame());
 		ent.setFrame(Mathf.clamp(ent.getFrame(),0,this.animationframes.length-0.4));
 		Draw.rect(this.baseimage, tile.drawx(), tile.drawy());
 		
@@ -85,6 +85,14 @@ const batchpress = extendContent(Block, "batch-press", {
 	handleItem(item,tile,source){
 		tile.entity.items.add(item, 1);
 	},
+	
+	setStats(){
+		this.super$setStats();
+		this.stats.add(BlockStat.productionTime, (1.0/(0.1*basecraftspeed)) / 60.0, StatUnit.seconds);
+		this.stats.add(BlockStat.input, new ItemListValue(new ItemStack(Items.coal, 9)));
+        this.stats.add(BlockStat.output, new ItemListValue(new ItemStack(Items.graphite, 9)));
+		
+	}
 	
 });
 

@@ -6,21 +6,17 @@
 	"health": 1500,
 	"update": true,
 	"solid":true,
-    "consumes": {
-      "power": 3.0,
-    },
 	
 	
-	
-	"outlineIcon" : true,
+	"outlineIcon" : false,
     "hasPower": true,
     "size": 3,
     "requirements": [
         { "item": "titanium", "amount": 100 },
         { "item": "graphite", "amount": 200 },
-		{ "item": "silicon", "amount": 250 },
-		{ "item": "surge-alloy", "amount": 180 },
-		{ "item": "plastanium", "amount": 200 },
+		{ "item": "silicon", "amount": 200 },
+		{ "item": "surge-alloy", "amount": 120 },
+		{ "item": "plastanium", "amount": 100 },
     ],
     "category": "turret",
 	"research": "spectre",

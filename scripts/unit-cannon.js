@@ -96,12 +96,16 @@ const unitcannon = extendContent(Block, "unit-cannon", {
 		
 		var ent = tile.entity;
 		var satisfaction = ent.power.graph.getSatisfaction() ;
-		ent.setReload(Math.max(0,ent.getReload()-basereloadspeed*satisfaction));
+		ent.setReload(Math.max(0,ent.getReload()-basereloadspeed*satisfaction*ent.delta()));
 		
 		
 		var coolingspeed = 0.005;
-		if(ent.liquids.total()>0.3){
-			coolingspeed *= ((1.0 + (ent.liquids.current().heatCapacity)));
+		var liquid = ent.liquids.current();
+		if(ent.liquids.get(liquid)>0.5){
+			coolingspeed *= ((1.0 + (liquid.heatCapacity)))  ;
+			if(ent.getHeat()>0.01){
+				ent.liquids.remove(liquid,0.5);
+			}
 		}
 		ent.setHeat(Math.max(0,ent.getHeat()-coolingspeed));
 		
@@ -265,11 +269,24 @@ const unitcannon = extendContent(Block, "unit-cannon", {
     },
 	generateIcons(){
         return [Core.atlas.find("block-" + 4), Core.atlas.find(this.name)];
-    }
+    },
+	setStats(){
+		this.super$setStats();
+		this.stats.add(BlockStat.range, range,StatUnit.blocks);
+		this.stats.add(BlockStat.booster, new BoosterListValue(1.0, this.consumes.get(ConsumeType.liquid).amount, 1.0, true,  boolf(liquid=>liquid.temperature<=0.5&&liquid.flammability<0.1))); //needs a boolf(liquid)
+	},
+	init(){
+		this.super$init();
+		this.consumes.powerCond(100, boolf(entity => entity.getTargetTile() !== -1));
+		
+	}
+	
+	
 
 	
 });
-
+const coolantfilter = new ConsumeLiquidFilter(boolf(liquid=>liquid.temperature<=0.5&&liquid.flammability<0.1), 0.5 * 1.0);
+unitcannon.consumes.add(coolantfilter).update(false);
 unitcannon.entityType=prov(()=>extend(TileEntity,{
 	
 	_heat:0,

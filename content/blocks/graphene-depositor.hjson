@@ -1,0 +1,20 @@
+{
+    "name": "Graphene Depositor",
+    "description": "Turns graphite into graphene, inefficient but gets the job done",
+    "hasLiquids": true,
+	"hasItems": true,
+	"update": true,
+    "hasPower": true,
+    "size": 3,
+    "requirements": [
+        { "item": "plastanium", "amount": 80 },
+        { "item": "surge-alloy", "amount": 25 },
+		{ "item": "silicon", "amount": 200 },
+		{ "item": "titanium", "amount": 200 },
+		{ "item": "graphite", "amount": 200 },
+    ],
+    "category": "crafting",
+	"group": "none",
+	"research": "equinox-tech-batch-press",
+
+}
